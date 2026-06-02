@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen - Menu</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .search-container {
+            position: relative;
+        }
+        .search-container input {
+            padding-left: 2.5rem;
+            border-radius: 50px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+        }
+        .search-container input:focus {
+            background: var(--glass-bg);
+            box-shadow: 0 0 0 0.25rem rgba(255, 69, 0, 0.25);
+            border-color: var(--primary-color);
+            color: var(--text-color);
+        }
+        .search-container .bi-search {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .filter-btn {
+            border-radius: 50px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .filter-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            gap: 0.5rem;
+            scrollbar-width: none; /* Firefox */
+        }
+        .filter-scroll::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .food-card {
+            border: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .food-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .food-img-wrapper {
+            height: 200px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #ccc;
+        }
+        
+        [data-theme="dark"] .food-img-wrapper {
+            background: #333;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="main-content container mt-4 animate-fade-in">
+        
+        <div class="row align-items-center mb-4">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <h2 class="fw-bold mb-0">Our Menu</h2>
+            </div>
+            <div class="col-md-6">
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="searchInput" class="form-control form-control-lg glass-panel" placeholder="Search for food...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-scroll mb-4" id="categoryFilters">
+            <button class="btn filter-btn active" data-filter="all">All Items</button>
+            <button class="btn filter-btn" data-filter="breakfast">Breakfast</button>
+            <button class="btn filter-btn" data-filter="meals">Meals</button>
+            <button class="btn filter-btn" data-filter="snacks">Snacks</button>
+            <button class="btn filter-btn" data-filter="drinks">Beverages</button>
+            <button class="btn filter-btn" data-filter="desserts">Desserts</button>
+        </div>
+
+        <!-- Food Grid -->
+        <div class="row g-4 mb-5" id="menuGrid">
+            <!-- Items injected by menu.js -->
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Menu pagination" class="mb-5">
+            <ul class="pagination justify-content-center" id="paginationControls">
+                <!-- Pagination injected by JS -->
+            </ul>
+        </nav>
+
+    </main>
+
+    <!-- Dynamic Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+    <script src="js/menu.js"></script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen - Track Order</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .tracker-line {
+            position: absolute;
+            left: 24px;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background-color: var(--glass-border);
+            z-index: 0;
+        }
+        
+        .tracker-step {
+            position: relative;
+            z-index: 1;
+            padding-left: 60px;
+            margin-bottom: 2rem;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+        
+        .tracker-step.active, .tracker-step.completed {
+            opacity: 1;
+        }
+        
+        .tracker-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+        
+        .tracker-step.completed .tracker-icon {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tracker-step.active .tracker-icon {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: 0 0 0 5px rgba(255, 69, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 69, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 69, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 69, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="main-content container mt-4 animate-fade-in">
+        <h2 class="fw-bold mb-4 text-center">Track Your Order</h2>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <!-- Search Order -->
+                <div class="glass-panel p-4 mb-4">
+                    <div class="input-group">
+                        <input type="text" id="orderIdInput" class="form-control" placeholder="Enter Order ID (e.g. ORD-123456)">
+                        <button class="btn btn-primary px-4" onclick="trackOrder()">Track</button>
+                    </div>
+                </div>
+                
+                <!-- Tracker UI -->
+                <div class="glass-panel p-4 position-relative" id="trackerUI" style="display: none;">
+                    <h5 class="fw-bold mb-4 pb-2 border-bottom border-secondary border-opacity-25">Order Status: <span id="displayOrderId" class="text-primary"></span></h5>
+                    
+                    <div class="position-relative mt-4">
+                        <div class="tracker-line"></div>
+                        
+                        <!-- Step 1 -->
+                        <div class="tracker-step completed" id="step1">
+                            <div class="tracker-icon"><i class="bi bi-receipt"></i></div>
+                            <h5 class="fw-bold mb-1">Order Placed</h5>
+                            <small class="text-muted" id="time1">Waiting...</small>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="tracker-step active" id="step2">
+                            <div class="tracker-icon"><i class="bi bi-fire"></i></div>
+                            <h5 class="fw-bold mb-1">Preparing</h5>
+                            <small class="text-muted" id="time2">Live Kitchen Status: In Progress</small>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="tracker-step" id="step3">
+                            <div class="tracker-icon"><i class="bi bi-box-seam"></i></div>
+                            <h5 class="fw-bold mb-1">Ready for Pickup / Out for Delivery</h5>
+                            <small class="text-muted" id="time3">Waiting...</small>
+                        </div>
+                        
+                        <!-- Step 4 -->
+                        <div class="tracker-step" id="step4">
+                            <div class="tracker-icon"><i class="bi bi-check-circle"></i></div>
+                            <h5 class="fw-bold mb-1">Completed</h5>
+                            <small class="text-muted" id="time4">Waiting...</small>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="simulateProgress()">Simulate Next Step (Demo)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Dynamic Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Socket.io Client -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+    <script>
+        let currentStep = 1;
+        let socket;
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            const lastOrder = localStorage.getItem("canteen_last_order");
+            if(lastOrder) {
+                document.getElementById("orderIdInput").value = lastOrder;
+                trackOrder();
+            }
+
+            // Initialize Socket
+            socket = io("http://localhost:5000");
+            
+            socket.on('order-status-updated', (data) => {
+                const trackedId = document.getElementById("orderIdInput").value.trim();
+                if (data.orderId === trackedId) {
+                    updateStepUI(data.status);
+                    showPushNotification(data.status);
+                }
+            });
+        });
+
+        function showPushNotification(status) {
+            if (Notification.permission === "granted") {
+                let title = "Order Update!";
+                let body = `Your order status is now: ${status}`;
+                
+                if (status === "Ready for Pickup") {
+                    title = "🍴 Order is Ready!";
+                    body = "Your delicious meal is ready for pickup at the counter!";
+                } else if (status === "Delivered") {
+                    title = "✅ Enjoy your meal!";
+                    body = "Your order has been successfully delivered/picked up.";
+                }
+
+                new Notification(title, {
+                    body: body,
+                    icon: "../assets/img/logo.png" // Path to your logo
+                });
+            }
+        }
+
+        async function trackOrder() {
+            const val = document.getElementById("orderIdInput").value.trim();
+            if(!val) return;
+            
+            document.getElementById("trackerUI").style.display = "block";
+            document.getElementById("displayOrderId").textContent = val;
+            
+            // Fetch current status from server
+            try {
+                const response = await fetch("http://localhost:5000/orders");
+                const data = await response.json();
+                const order = data.orders.find(o => o._id === val);
+                if (order) {
+                    updateStepUI(order.status);
+                }
+            } catch(err) {
+                console.error("Error fetching order status:", err);
+            }
+        }
+
+        function updateStepUI(status) {
+            // Reset all steps
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById("step" + i);
+                step.classList.remove("active", "completed");
+            }
+
+            const now = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            if (status === "Pending" || status === "Accepted") {
+                document.getElementById("step1").classList.add("active");
+                document.getElementById("time1").textContent = "Order Accepted - " + now;
+                currentStep = 1;
+            } else if (status === "Preparing") {
+                document.getElementById("step1").classList.add("completed");
+                document.getElementById("step2").classList.add("active");
+                document.getElementById("time2").textContent = "In Kitchen - " + now;
+                currentStep = 2;
+            } else if (status === "Ready for Pickup" || status === "Out for Delivery") {
+                document.getElementById("step1").classList.add("completed");
+                document.getElementById("step2").classList.add("completed");
+                document.getElementById("step3").classList.add("active");
+                document.getElementById("time3").textContent = "Ready! - " + now;
+                currentStep = 3;
+            } else if (status === "Delivered" || status === "Completed") {
+                document.getElementById("step1").classList.add("completed");
+                document.getElementById("step2").classList.add("completed");
+                document.getElementById("step3").classList.add("completed");
+                document.getElementById("step4").classList.add("completed");
+                document.getElementById("time4").textContent = "Delivered - " + now;
+                currentStep = 4;
+            }
+        }
+    </script>
+</body>
+</html>

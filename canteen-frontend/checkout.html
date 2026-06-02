@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen - Checkout</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .form-control, .form-select {
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: var(--glass-bg);
+            color: var(--text-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(255, 69, 0, 0.25);
+        }
+        
+        .payment-method {
+            border: 2px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method.active {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 69, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="main-content container mt-4 animate-fade-in">
+        <h2 class="fw-bold mb-4">Checkout</h2>
+        
+        <form id="checkoutForm" action="success.html" onsubmit="return handleCheckout(event)">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <!-- Contact Info -->
+                    <div class="glass-panel p-4 mb-4">
+                        <h4 class="fw-bold mb-3">Contact Information</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">First Name</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Last Name</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Email</label>
+                                <input type="email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Phone Number</label>
+                                <input type="tel" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery/Pickup Options -->
+                    <div class="glass-panel p-4 mb-4">
+                        <h4 class="fw-bold mb-3">Order Type</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="payment-method active" id="pickupOpt" onclick="selectType('pickup')">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-shop fs-3 me-3 text-primary"></i>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">Pick Up</h6>
+                                            <small class="text-muted">Collect from counter</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="payment-method" id="deliveryOpt" onclick="selectType('delivery')">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-bicycle fs-3 me-3 text-primary"></i>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">Delivery</h6>
+                                            <small class="text-muted">To your desk/hostel</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="deliveryDetails" class="mt-3 d-none">
+                            <label class="form-label text-muted">Delivery Location / Room No.</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <!-- Payment -->
+                    <div class="glass-panel p-4">
+                        <h4 class="fw-bold mb-3">Payment Method</h4>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-check p-3 border rounded mb-2">
+                                    <input class="form-check-input ms-1" type="radio" name="payment" id="upi" checked>
+                                    <label class="form-check-label ms-3 fw-bold" for="upi">
+                                        <i class="bi bi-qr-code-scan me-2 text-primary"></i> UPI / QR
+                                    </label>
+                                </div>
+                                <div class="form-check p-3 border rounded">
+                                    <input class="form-check-input ms-1" type="radio" name="payment" id="cash">
+                                    <label class="form-check-label ms-3 fw-bold" for="cash">
+                                        <i class="bi bi-cash-coin me-2 text-success"></i> Cash on Counter
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="glass-panel p-4 sticky-top" style="top: 100px;">
+                        <h4 class="fw-bold mb-4">Summary</h4>
+                        <div id="checkoutItems" class="mb-3">
+                            <!-- Items list injected here -->
+                        </div>
+                        <hr class="border-secondary opacity-25">
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fw-bold fs-5">Total to Pay</span>
+                            <span class="fw-bold fs-5" style="color: var(--primary-color);" id="checkoutTotal">₹0</span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fs-5 shadow-sm">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Dynamic Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadSummary();
+        });
+
+        function loadSummary() {
+            const cart = JSON.parse(localStorage.getItem("canteen_cart")) || [];
+            if(cart.length === 0) {
+                window.location.href = "menu.html";
+                return;
+            }
+            
+            const list = document.getElementById("checkoutItems");
+            let subtotal = 0;
+            let html = "";
+            
+            cart.forEach(item => {
+                const total = item.price * item.quantity;
+                subtotal += total;
+                html += `
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>₹${total}</span>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+            
+            const tax = Math.round(subtotal * 0.05);
+            document.getElementById("checkoutTotal").textContent = `₹${subtotal + tax}`;
+        }
+        
+        function selectType(type) {
+            document.getElementById("pickupOpt").classList.remove("active");
+            document.getElementById("deliveryOpt").classList.remove("active");
+            document.getElementById(type + "Opt").classList.add("active");
+            
+            if(type === 'delivery') {
+                document.getElementById("deliveryDetails").classList.remove("d-none");
+                document.getElementById("deliveryDetails").querySelector("input").required = true;
+            } else {
+                document.getElementById("deliveryDetails").classList.add("d-none");
+                document.getElementById("deliveryDetails").querySelector("input").required = false;
+            }
+        }
+        
+        function handleCheckout(e) {
+            e.preventDefault();
+            // Clear cart upon successful order
+            localStorage.removeItem("canteen_cart");
+            // Simulate order ID generation
+            localStorage.setItem("canteen_last_order", "ORD-" + Math.floor(Math.random() * 1000000));
+            window.location.href = "success.html";
+        }
+    </script>
+</body>
+</html>

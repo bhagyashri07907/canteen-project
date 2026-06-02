@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar d-none d-md-block">
+                <div class="text-center mb-4 px-3">
+                    <h4 class="text-white fw-bold"><i class="bi bi-shop me-2"></i>Admin</h4>
+                </div>
+                <a href="dashboard.html"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+                <a href="manage-menu.html"><i class="bi bi-journal-text me-2"></i> Manage Menu</a>
+                <a href="orders.html"><i class="bi bi-box-seam me-2"></i> Orders <span class="badge bg-danger ms-2">Live</span></a>
+                <a href="qr-manager.html"><i class="bi bi-qr-code me-2"></i> QR Ordering</a>
+                <a href="users.html"><i class="bi bi-people me-2"></i> Users</a>
+                <a href="../index.html" class="mt-5 text-white-50"><i class="bi bi-box-arrow-left me-2"></i> Logout</a>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-10 bg-light" style="min-height: 100vh;">
+                <!-- Top Navbar -->
+                <nav class="navbar navbar-light bg-white border-bottom px-4 py-3 mb-4">
+                    <h5 class="mb-0 fw-bold">System Settings</h5>
+                    <div class="d-flex align-items-center">
+                        <!-- Notifications -->
+                        <div class="dropdown me-3">
+                            <button class="btn btn-light rounded-circle position-relative" data-bs-toggle="dropdown">
+                                <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">3</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="width: 300px;">
+                                <li class="px-3 py-2 border-bottom fw-bold">Notifications</li>
+                                <li><a class="dropdown-item py-3 border-bottom" href="orders.html">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3"><i class="bi bi-cart-fill"></i></div>
+                                        <div><div class="small fw-bold">New Order Received</div><div class="text-muted small">Order #8821 just came in</div></div>
+                                    </div>
+                                </a></li>
+                                <li><a class="dropdown-item text-center small text-primary py-2" href="#">View All Notifications</a></li>
+                            </ul>
+                        </div>
+                        <!-- Profile -->
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=FF4500&color=fff" class="rounded-circle shadow-sm" width="40">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                <li class="px-4 py-3 border-bottom">
+                                    <div class="fw-bold">Administrator</div>
+                                    <div class="small text-muted">admin@canteen.com</div>
+                                </li>
+                                <li><a class="dropdown-item py-2" href="profile.html"><i class="bi bi-person me-2"></i> My Profile</a></li>
+                                <li><a class="dropdown-item py-2 active" href="settings.html"><i class="bi bi-gear me-2"></i> Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item py-2 text-danger" href="../index.html"><i class="bi bi-box-arrow-left me-2"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+                
+                <div class="px-4">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-header bg-white py-3 border-bottom">
+                                    <h6 class="fw-bold mb-0">General Configuration</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted small fw-bold">Canteen Name</label>
+                                                <input type="text" class="form-control" value="Vaish Canteen">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted small fw-bold">Tagline</label>
+                                                <input type="text" class="form-control" value="Fresh & Healthy Food Every Day">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label text-muted small fw-bold">Opening Time</label>
+                                                <input type="time" class="form-control" value="08:00">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label text-muted small fw-bold">Closing Time</label>
+                                                <input type="time" class="form-control" value="20:00">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label text-muted small fw-bold">Canteen Status</label>
+                                                <select class="form-select">
+                                                    <option selected>Open</option>
+                                                    <option>Closed (Holiday)</option>
+                                                    <option>Closed (Maintenance)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-primary mt-4 px-4 rounded-pill">Update Settings</button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-header bg-white py-3 border-bottom">
+                                    <h6 class="fw-bold mb-0">Payment & Tax Settings</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted small fw-bold">Merchant UPI ID</label>
+                                                <input type="text" class="form-control" value="canteen@upi">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted small fw-bold">Tax (GST) Rate %</label>
+                                                <input type="number" class="form-control" value="5">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted small fw-bold">Currency Symbol</label>
+                                                <input type="text" class="form-control" value="₹">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-muted small fw-bold">Min Order Value</label>
+                                                <input type="number" class="form-control" value="20">
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-primary mt-4 px-4 rounded-pill">Save Configuration</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen - Register</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 5rem auto;
+        }
+        .form-control {
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+        }
+        .form-control:focus {
+            background-color: var(--glass-bg);
+            color: var(--text-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(255, 69, 0, 0.25);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="main-content container animate-fade-in">
+        <div class="auth-container glass-panel p-4 p-md-5">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus fs-1 text-primary"></i>
+                <h2 class="fw-bold mt-2">Create Account</h2>
+                <p class="text-muted">Join to start ordering</p>
+            </div>
+            
+            <form id="registerForm" onsubmit="return handleRegister(event)">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Username</label>
+                    <input type="text" id="username" class="form-control" required placeholder="Choose a username">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Email</label>
+                    <input type="email" id="email" class="form-control" required placeholder="Enter your email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Branch Name</label>
+                    <input type="text" id="branch" class="form-control" required placeholder="Enter your branch (e.g., CSE)">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Year</label>
+                    <input type="number" id="year" class="form-control" required placeholder="Enter your year (e.g., 2)">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted">Password</label>
+                    <input type="password" id="password" class="form-control" required placeholder="Choose a password">
+                </div>
+                
+                <div id="registerMsg" class="alert d-none mb-3" role="alert"></div>
+                
+                <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fs-5 shadow-sm mb-3">Register</button>
+                
+                <div class="text-center mt-3">
+                    <span class="text-muted">Already have an account?</span>
+                    <a href="login.html" class="text-primary text-decoration-none fw-bold ms-1">Login</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Dynamic Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+    <script>
+        async function handleRegister(e) {
+            e.preventDefault();
+            const user = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const branch = document.getElementById("branch").value;
+            const year = document.getElementById("year").value;
+            const pass = document.getElementById("password").value;
+            const msgEl = document.getElementById("registerMsg");
+            
+            msgEl.className = "alert mb-3"; // reset classes
+            
+            try {
+                const response = await fetch("http://localhost:5000/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        username: user, 
+                        email: email, 
+                        branch: branch, 
+                        year: year, 
+                        password: pass 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.message === "Registration Successful") {
+                    msgEl.classList.add("alert-success");
+                    msgEl.textContent = data.message + ". Redirecting to login...";
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 1500);
+                } else {
+                    msgEl.classList.add("alert-danger");
+                    msgEl.textContent = data.message || "Registration failed";
+                }
+            } catch (err) {
+                msgEl.classList.add("alert-danger");
+                msgEl.textContent = "Server error. Please try again later.";
+            }
+        }
+    </script>
+</body>
+</html>

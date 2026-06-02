@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canteen - Order Receipt</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .receipt-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            color: #333;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .receipt-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .receipt-body {
+            padding: 2rem;
+        }
+        
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .total-section {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid #eee;
+        }
+        
+        .print-only {
+            display: none;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .receipt-container, .receipt-container * {
+                visibility: visible;
+            }
+            .receipt-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        [data-theme="dark"] .receipt-container {
+            background: #1a1a1a;
+            color: #f8f9fa;
+        }
+        [data-theme="dark"] .item-row {
+            border-bottom-color: #333;
+        }
+        [data-theme="dark"] .total-section {
+            border-top-color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Navbar -->
+    <div id="navbar-placeholder" class="no-print"></div>
+
+    <main class="main-content container mt-4 mb-5 animate-fade-in">
+        <div id="receiptLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Generating your receipt...</p>
+        </div>
+
+        <div id="receiptContent" class="receipt-container d-none">
+            <div class="receipt-header">
+                <i class="bi bi-check-circle-fill mb-2" style="font-size: 3rem;"></i>
+                <h2 class="fw-bold mb-1">Payment Successful</h2>
+                <p class="mb-0 opacity-75">Thank you for your order!</p>
+            </div>
+            
+            <div class="receipt-body">
+                <div class="d-flex justify-content-between mb-4 small">
+                    <div>
+                        <span class="text-muted d-block">Order ID</span>
+                        <strong id="receiptOrderId">ORD-XXXXXX</strong>
+                    </div>
+                    <div class="text-end">
+                        <span class="text-muted d-block">Date</span>
+                        <strong id="receiptDate">--/--/----</strong>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-2 text-primary">Customer Details</h6>
+                    <div class="small">
+                        <p class="mb-1"><i class="bi bi-person me-2"></i><span id="receiptName">Loading...</span></p>
+                        <p class="mb-1"><i class="bi bi-phone me-2"></i><span id="receiptPhone">N/A</span></p>
+                        <p class="mb-1"><i class="bi bi-geo-alt me-2"></i><span id="receiptType">Pickup</span></p>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold mb-3">Order Summary</h6>
+                <div id="receiptItems">
+                    <!-- Items will be injected here -->
+                </div>
+
+                <div class="total-section">
+                    <div class="d-flex justify-content-between mb-1 small">
+                        <span class="text-muted">Subtotal</span>
+                        <span id="receiptSubtotal">₹0</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1 small">
+                        <span class="text-muted">GST (5%)</span>
+                        <span id="receiptTax">₹0</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <h5 class="fw-bold">Total Amount</h5>
+                        <h5 class="fw-bold text-primary" id="receiptTotal">₹0</h5>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded small text-dark border">
+                    <div class="d-flex justify-content-between">
+                        <span>Payment Method:</span>
+                        <span class="fw-bold" id="receiptPayment">UPI</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Payment Status:</span>
+                        <span class="badge bg-success" id="receiptPaymentStatus">Paid</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-grid gap-2 no-print">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button onclick="window.print()" class="btn btn-outline-primary w-100 rounded-pill">
+                                <i class="bi bi-printer me-2"></i>Print
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <a id="trackOrderBtn" href="track.html" class="btn btn-primary w-100 rounded-pill">
+                                <i class="bi bi-geo-fill me-2"></i>Track Order
+                            </a>
+                        </div>
+                    </div>
+                    <a href="menu.html" class="btn btn-link text-muted">Back to Menu</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Dynamic Footer -->
+    <div id="footer-placeholder" class="no-print"></div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('id') || localStorage.getItem("canteen_last_order");
+            
+            if (!orderId) {
+                window.location.href = "menu.html";
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/order/${orderId}`);
+                if (!response.ok) throw new Error("Order not found");
+                
+                const order = await response.json();
+                renderReceipt(order);
+            } catch (err) {
+                console.error("Error fetching order:", err);
+                // Fallback to local storage if server fails
+                const lastOrderId = localStorage.getItem("canteen_last_order");
+                if (lastOrderId) {
+                    document.getElementById("receiptOrderId").textContent = lastOrderId;
+                    document.getElementById("receiptContent").classList.remove("d-none");
+                    document.getElementById("receiptLoading").classList.add("d-none");
+                }
+            }
+        });
+
+        function renderReceipt(order) {
+            document.getElementById("receiptOrderId").textContent = order._id;
+            document.getElementById("receiptDate").textContent = new Date(order.date).toLocaleDateString() + ' ' + new Date(order.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById("receiptName").textContent = order.customerName;
+            document.getElementById("receiptPayment").textContent = order.paymentMethod;
+            document.getElementById("receiptPaymentStatus").textContent = order.paymentStatus || 'Paid';
+            
+            const customerDetails = JSON.parse(localStorage.getItem("canteen_customer_details")) || {};
+            document.getElementById("receiptPhone").textContent = customerDetails.phone || "N/A";
+            document.getElementById("receiptType").textContent = order.tableNumber ? `Table Service (Table ${order.tableNumber})` : "Self Pickup";
+
+            let itemsHtml = "";
+            let subtotal = 0;
+            order.items.forEach(item => {
+                const lineTotal = item.price * item.quantity;
+                subtotal += lineTotal;
+                itemsHtml += `
+                    <div class="item-row">
+                        <div>
+                            <span class="fw-bold">${item.quantity}x</span> ${item.name}
+                        </div>
+                        <span>₹${lineTotal}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById("receiptItems").innerHTML = itemsHtml;
+            document.getElementById("receiptSubtotal").textContent = `₹${subtotal}`;
+            const tax = Math.round(subtotal * 0.05);
+            document.getElementById("receiptTax").textContent = `₹${tax}`;
+            document.getElementById("receiptTotal").textContent = `₹${subtotal + tax}`;
+            
+            document.getElementById("trackOrderBtn").href = `track.html?id=${order._id}`;
+
+            document.getElementById("receiptLoading").classList.add("d-none");
+            document.getElementById("receiptContent").classList.remove("d-none");
+        }
+    </script>
+</body>
+</html>

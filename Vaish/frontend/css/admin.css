@@ -1,0 +1,41 @@
+/* Admin Specific Styles */
+
+.sidebar {
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    background: var(--secondary-color);
+    color: white;
+    padding-top: 2rem;
+}
+
+.sidebar a {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 1rem 1.5rem;
+    display: block;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.sidebar a:hover, .sidebar a.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-left: 4px solid var(--primary-color);
+}
+
+.stat-card {
+    border-left: 4px solid var(--primary-color);
+}
+
+.table-glass {
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+[data-theme="dark"] .table {
+    color: var(--text-color);
+}
+[data-theme="dark"] .sidebar {
+    background: #1a1a1a;
+}
